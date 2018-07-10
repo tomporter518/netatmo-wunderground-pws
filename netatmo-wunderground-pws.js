@@ -91,4 +91,4 @@ function setObservations(){
     });
 }
 
-module.exports = getNetatmoData();
+module.exports = {getNetatmoData: getNetatmoData};

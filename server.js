@@ -1,6 +1,8 @@
 var express = require('express');
 var app = express();
-var netatmoWunderground = require('./netatmo-wunderground-pws')
+var netatmoWunderground = require('./netatmo-wunderground-pws.js')
+
+netatmoWunderground.getNetatmoData();
 
 //Refresh and upload data every 5 minutes
 setInterval(function() {

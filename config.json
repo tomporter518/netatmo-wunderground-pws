@@ -1,0 +1,8 @@
+{
+    "netatmoClientId" : "xxxxxxxxxx",
+    "netatmoClientSecret" : "xxxxxxxxxxxxxxxxxxxxxxxx",
+    "netatmoUsername":"user@gmail.com",
+    "netatmoPassword":"xxxxxxx",
+    "wundergroundStationId":"XXXXXX",
+    "wundergroundUserPassword":"XXXXXXXX"
+}

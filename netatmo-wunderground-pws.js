@@ -81,7 +81,13 @@ function setObservations(){
     });
 
     pws.sendObservations(function(err, success){
-        console.log("Data sent!");
+        if (err){
+            console.error("Error sending data to Weather Underground: " + err.message);
+        }
+        else{
+            console.debug("Data successfully sent!");
+        }
+        
     });
 }
 

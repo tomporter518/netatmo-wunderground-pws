@@ -1,18 +1,29 @@
 
-var config = require('./config.json');
 var netatmo = require('netatmo')
-var PWS = require('wunderground-pws');
-var pws = new PWS(config.wundergroundStationId, config.wundergroundUserPassword);
+var PWS = require('wunderground-upload');
 
-//Set Netatmo auth vars
-var auth = {
-    "client_id": config.netatmoClientId,
-    "client_secret": config.netatmoClientSecret,
-    "username": config.netatmoUsername,
-    "password": config.netatmoPassword
+var netatmoAuth;
+var wundergroundAuth;
+
+var netatmo_pws = function (args) {
+    this.setAuthVars(args);
   };
 
-var api = new netatmo(auth);
+netatmo_pws.prototype.setAuthVars = function(args) {
+    netatmoAuth = {
+        "client_id": args.netamo_client_id,
+        "client_secret": args.netamo_client_secret,
+        "username": args.netamo_username,
+        "password": args.netamo_password,
+    };   
+    wundergroundAuth = {
+        "wundergroundStationId": args.wundergroundStationId,
+        "wundergroundUserPassword": args.wundergroundUserPassword
+    };
+}
+
+var pws;
+var api;
 
 //Data vars
 var winddirection;
@@ -27,7 +38,8 @@ var baromin;
 var softwaretype=  'netatmo-wunderground-pws';
 
 //Get data from Netatmo weather station
-function getNetatmoData(){
+netatmo_pws.prototype.getNetatmoData = function (){
+    api = new netatmo(netatmoAuth);
     console.debug("Getting Netatmo data...");
     api.getStationsData(function(err, devices) {    
         let dev = devices[0];
@@ -45,15 +57,15 @@ function getNetatmoData(){
             else if (mod.type == "NAModule3"){  //Rain module
                 console.debug("Got rain module data...");
                 let data = mod.dashboard_data;
-                rainin = data.Rain;
-                dailyrainin = data.sum_rain_24;            
+                rainin = convertFromMmtoIn(data.sum_rain_1);
+                dailyrainin = convertFromMmtoIn(data.sum_rain_24);
             }
             else if (mod.type == "NAModule2"){  //Wind module
                 console.debug("Got wind module data...");
                 let data = mod.dashboard_data;
                 winddirection = data.WindAngle;
-                windspeed = data.WindStrength;
-                windgust = data.GustStrength
+                windspeed = convertFromKphToMph(data.WindStrength);
+                windgust = convertFromKphToMph(data.GustStrength);
             }        
         }
         setObservations();    
@@ -62,11 +74,29 @@ function getNetatmoData(){
 
 function convertFromCtoF(value){
     return value * 9 /5 + 32
-} 
+}
+
+function convertFromKphToMph(value){
+    return value * 0.621371;
+}
+
+function convertFromMmtoIn(value){
+    return value * 0.0393701;
+}
 
 //Send to Wunderground
 function setObservations(){
+    pws = undefined;
+    pws = new PWS(wundergroundAuth.wundergroundStationId, wundergroundAuth.wundergroundUserPassword);
     console.debug("Sending to Weather Underground...");
+    console.debug("Temp: " + tempf);
+    console.debug("Humidity: " + humidity);
+    console.debug("DewPt: " + dewptf);
+    console.debug("Windspeed: " + windspeed);
+    console.debug("WindGust: " + windgust);
+    console.debug("rain: " + rainin);
+    console.debug("dailyRain: " + dailyrainin);
+    pws.resetObservations();
     pws.setObservations({
         winddir: winddirection,
         windspeedmph: windspeed,
@@ -91,4 +121,4 @@ function setObservations(){
     });
 }
 
-module.exports = {getNetatmoData: getNetatmoData};
+module.exports = netatmo_pws;

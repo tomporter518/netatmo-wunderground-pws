@@ -1,12 +1,10 @@
 {
-  "name": "netatmo-wunderground-pws",
+  "name": "netatmo-wunderground-agent",
   "version": "1.0.0",
   "description": "Connects Netatmo data to a Weather Underground PWS station",
-  "main": "netatmo-wunderground.js",
+  "main": "server.js",
   "dependencies": {
-    "express": "^4.16.3",
-    "netatmo": "^2.2.1",
-    "wunderground-pws": "^1.3.1"
+    "netatmo-wunderground-pws": "^1.0.0"
   },
   "devDependencies": {},
   "scripts": {

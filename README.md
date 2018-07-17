@@ -36,3 +36,5 @@ setInterval(function() {
     netatmoWundergroundUploader.getNetatmoData();
   }, 150000);
 ```
+
+For a full working node project, go here: https://github.com/brbeaird/netatmo-wunderground-agent

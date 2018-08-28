@@ -1,6 +1,6 @@
 
 var netatmo = require('netatmo')
-var PWS = require('wunderground-upload');
+var PWS = require('wunderground-pws');
 
 var netatmoAuth;
 var wundergroundAuth;

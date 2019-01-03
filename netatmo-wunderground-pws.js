@@ -47,25 +47,40 @@ netatmo_pws.prototype.getNetatmoData = function (){
         
         for (let mod of dev.modules){
             if (mod.type == "NAModule1"){   //Outdoor module
-                console.debug("Got outdoor data...");
-                let data = mod.dashboard_data;                
-                tempf = convertFromCtoF(data.Temperature);
-                humidity = data.Humidity;
-                dewptf = (data.Temperature - (14.55 + 0.114 * data.Temperature) * (1 - (0.01 * data.Humidity)) - Math.pow((2.5 + 0.007 * data.Temperature) * (1 - (0.01 * data.Humidity)), 3) - (15.9 + 0.117 * data.Temperature) * Math.pow(1 - (0.01 * data.Humidity), 14));
-                dewptf = convertFromCtoF(dewptf);            
+                if (mod.reachable){
+                    console.debug("Got outdoor data...");
+                    let data = mod.dashboard_data;                
+                    tempf = convertFromCtoF(data.Temperature);
+                    humidity = data.Humidity;
+                    dewptf = (data.Temperature - (14.55 + 0.114 * data.Temperature) * (1 - (0.01 * data.Humidity)) - Math.pow((2.5 + 0.007 * data.Temperature) * (1 - (0.01 * data.Humidity)), 3) - (15.9 + 0.117 * data.Temperature) * Math.pow(1 - (0.01 * data.Humidity), 14));
+                    dewptf = convertFromCtoF(dewptf);   
+                }
+                else{
+                    console.debug("Wind module is unreachable.");
+                }
             }
             else if (mod.type == "NAModule3"){  //Rain module
-                console.debug("Got rain module data...");
-                let data = mod.dashboard_data;
-                rainin = convertFromMmtoIn(data.sum_rain_1);
-                dailyrainin = convertFromMmtoIn(data.sum_rain_24);
+                if (mod.reachable){
+                    console.debug("Got rain module data...");
+                    let data = mod.dashboard_data;
+                    rainin = convertFromMmtoIn(data.sum_rain_1);
+                    dailyrainin = convertFromMmtoIn(data.sum_rain_24);
+                }
+                else{
+                    console.debug("Wind module is unreachable.");
+                }
             }
             else if (mod.type == "NAModule2"){  //Wind module
-                console.debug("Got wind module data...");
-                let data = mod.dashboard_data;
-                winddirection = data.WindAngle;
-                windspeed = convertFromKphToMph(data.WindStrength);
-                windgust = convertFromKphToMph(data.GustStrength);
+                if (mod.reachable){
+                    console.debug("Got wind module data...");
+                    let data = mod.dashboard_data;
+                    winddirection = data.WindAngle;
+                    windspeed = convertFromKphToMph(data.WindStrength);
+                    windgust = convertFromKphToMph(data.GustStrength);
+                }
+                else{
+                    console.debug("Wind module is unreachable.");
+                }
             }        
         }
         setObservations();    

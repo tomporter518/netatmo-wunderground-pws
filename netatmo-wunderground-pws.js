@@ -15,7 +15,7 @@ netatmo_pws.prototype.setAuthVars = function(args) {
         "client_secret": args.netamo_client_secret,
         "username": args.netamo_username,
         "password": args.netamo_password,
-    };   
+    };
     wundergroundAuth = {
         "wundergroundStationId": args.wundergroundStationId,
         "wundergroundUserPassword": args.wundergroundUserPassword
@@ -41,22 +41,22 @@ var softwaretype=  'netatmo-wunderground-pws';
 netatmo_pws.prototype.getNetatmoData = function (){
     api = new netatmo(netatmoAuth);
     console.debug("Getting Netatmo data...");
-    api.getStationsData(function(err, devices) {    
+    api.getStationsData(function(err, devices) {
         let dev = devices[0];
         baromin = dev.dashboard_data.Pressure * 0.0295299830714;
-        
+
         for (let mod of dev.modules){
             if (mod.type == "NAModule1"){   //Outdoor module
                 if (mod.reachable){
                     console.debug("Got outdoor data...");
-                    let data = mod.dashboard_data;                
+                    let data = mod.dashboard_data;
                     tempf = convertFromCtoF(data.Temperature);
                     humidity = data.Humidity;
                     dewptf = (data.Temperature - (14.55 + 0.114 * data.Temperature) * (1 - (0.01 * data.Humidity)) - Math.pow((2.5 + 0.007 * data.Temperature) * (1 - (0.01 * data.Humidity)), 3) - (15.9 + 0.117 * data.Temperature) * Math.pow(1 - (0.01 * data.Humidity), 14));
-                    dewptf = convertFromCtoF(dewptf);   
+                    dewptf = convertFromCtoF(dewptf);
                 }
                 else{
-                    console.debug("Wind module is unreachable.");
+                    console.error("Outdoor module is unreachable.");
                 }
             }
             else if (mod.type == "NAModule3"){  //Rain module
@@ -67,7 +67,7 @@ netatmo_pws.prototype.getNetatmoData = function (){
                     dailyrainin = convertFromMmtoIn(data.sum_rain_24);
                 }
                 else{
-                    console.debug("Wind module is unreachable.");
+                    console.error("Rain module is unreachable.");
                 }
             }
             else if (mod.type == "NAModule2"){  //Wind module
@@ -79,11 +79,11 @@ netatmo_pws.prototype.getNetatmoData = function (){
                     windgust = convertFromKphToMph(data.GustStrength);
                 }
                 else{
-                    console.debug("Wind module is unreachable.");
+                    console.error("Wind module is unreachable.");
                 }
-            }        
+            }
         }
-        setObservations();    
+        setObservations();
     });
 }
 
@@ -132,7 +132,7 @@ function setObservations(){
         else{
             console.debug("Data successfully sent!");
         }
-        
+
     });
 }
 

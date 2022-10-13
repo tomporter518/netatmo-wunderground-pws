@@ -39,52 +39,56 @@ var softwaretype=  'netatmo-wunderground-pws';
 
 //Get data from Netatmo weather station
 netatmo_pws.prototype.getNetatmoData = function (){
-    api = new netatmo(netatmoAuth);
-    console.debug("Getting Netatmo data...");
-    api.getStationsData(function(err, devices) {
-        let dev = devices[0];
-        baromin = dev.dashboard_data.Pressure * 0.0295299830714;
+    try {
+        api = new netatmo(netatmoAuth);
+        console.debug("Getting Netatmo data...");
+        api.getStationsData(function(err, devices) {
+            let dev = devices[0];
+            baromin = dev.dashboard_data.Pressure * 0.0295299830714;
 
-        for (let mod of dev.modules){
-            if (mod.type == "NAModule1"){   //Outdoor module
-                if (mod.reachable){
-                    console.debug("Got outdoor data...");
-                    let data = mod.dashboard_data;
-                    tempf = convertFromCtoF(data.Temperature);
-                    humidity = data.Humidity;
-                    dewptf = (data.Temperature - (14.55 + 0.114 * data.Temperature) * (1 - (0.01 * data.Humidity)) - Math.pow((2.5 + 0.007 * data.Temperature) * (1 - (0.01 * data.Humidity)), 3) - (15.9 + 0.117 * data.Temperature) * Math.pow(1 - (0.01 * data.Humidity), 14));
-                    dewptf = convertFromCtoF(dewptf);
+            for (let mod of dev.modules){
+                if (mod.type == "NAModule1"){   //Outdoor module
+                    if (mod.reachable){
+                        console.debug("Got outdoor data...");
+                        let data = mod.dashboard_data;
+                        tempf = convertFromCtoF(data.Temperature);
+                        humidity = data.Humidity;
+                        dewptf = (data.Temperature - (14.55 + 0.114 * data.Temperature) * (1 - (0.01 * data.Humidity)) - Math.pow((2.5 + 0.007 * data.Temperature) * (1 - (0.01 * data.Humidity)), 3) - (15.9 + 0.117 * data.Temperature) * Math.pow(1 - (0.01 * data.Humidity), 14));
+                        dewptf = convertFromCtoF(dewptf);
+                    }
+                    else{
+                        console.error("Outdoor module is unreachable.");
+                    }
                 }
-                else{
-                    console.error("Outdoor module is unreachable.");
+                else if (mod.type == "NAModule3"){  //Rain module
+                    if (mod.reachable){
+                        console.debug("Got rain module data...");
+                        let data = mod.dashboard_data;
+                        rainin = convertFromMmtoIn(data.sum_rain_1);
+                        dailyrainin = convertFromMmtoIn(data.sum_rain_24);
+                    }
+                    else{
+                        console.error("Rain module is unreachable.");
+                    }
+                }
+                else if (mod.type == "NAModule2"){  //Wind module
+                    if (mod.reachable){
+                        console.debug("Got wind module data...");
+                        let data = mod.dashboard_data;
+                        winddirection = data.WindAngle;
+                        windspeed = convertFromKphToMph(data.WindStrength);
+                        windgust = convertFromKphToMph(data.GustStrength);
+                    }
+                    else{
+                        console.error("Wind module is unreachable.");
+                    }
                 }
             }
-            else if (mod.type == "NAModule3"){  //Rain module
-                if (mod.reachable){
-                    console.debug("Got rain module data...");
-                    let data = mod.dashboard_data;
-                    rainin = convertFromMmtoIn(data.sum_rain_1);
-                    dailyrainin = convertFromMmtoIn(data.sum_rain_24);
-                }
-                else{
-                    console.error("Rain module is unreachable.");
-                }
-            }
-            else if (mod.type == "NAModule2"){  //Wind module
-                if (mod.reachable){
-                    console.debug("Got wind module data...");
-                    let data = mod.dashboard_data;
-                    winddirection = data.WindAngle;
-                    windspeed = convertFromKphToMph(data.WindStrength);
-                    windgust = convertFromKphToMph(data.GustStrength);
-                }
-                else{
-                    console.error("Wind module is unreachable.");
-                }
-            }
-        }
-        setObservations();
-    });
+            setObservations();
+        });
+    } catch (error) {
+        console.error(error.message);
+    }
 }
 
 function convertFromCtoF(value){
@@ -101,39 +105,43 @@ function convertFromMmtoIn(value){
 
 //Send to Wunderground
 function setObservations(){
-    pws = undefined;
-    pws = new PWS(wundergroundAuth.wundergroundStationId, wundergroundAuth.wundergroundUserPassword);
-    console.debug("Sending to Weather Underground...");
-    console.debug("Temp: " + tempf);
-    console.debug("Humidity: " + humidity);
-    console.debug("DewPt: " + dewptf);
-    console.debug("Windspeed: " + windspeed);
-    console.debug("WindGust: " + windgust);
-    console.debug("rain: " + rainin);
-    console.debug("dailyRain: " + dailyrainin);
-    pws.resetObservations();
-    pws.setObservations({
-        winddir: winddirection,
-        windspeedmph: windspeed,
-        windgustmph: windgust,
-        humidity: humidity,
-        dewptf: dewptf,
-        tempf: tempf,
-        rainin: rainin,
-        dailyrainin: dailyrainin,
-        baromin: baromin,
-        softwaretype: softwaretype
-    });
+    try {
+        pws = undefined;
+        pws = new PWS(wundergroundAuth.wundergroundStationId, wundergroundAuth.wundergroundUserPassword);
+        console.debug("Sending to Weather Underground...");
+        console.debug("Temp: " + tempf);
+        console.debug("Humidity: " + humidity);
+        console.debug("DewPt: " + dewptf);
+        console.debug("Windspeed: " + windspeed);
+        console.debug("WindGust: " + windgust);
+        console.debug("rain: " + rainin);
+        console.debug("dailyRain: " + dailyrainin);
+        pws.resetObservations();
+        pws.setObservations({
+            winddir: winddirection,
+            windspeedmph: windspeed,
+            windgustmph: windgust,
+            humidity: humidity,
+            dewptf: dewptf,
+            tempf: tempf,
+            rainin: rainin,
+            dailyrainin: dailyrainin,
+            baromin: baromin,
+            softwaretype: softwaretype
+        });
 
-    pws.sendObservations(function(err, success){
-        if (err){
-            console.error("Error sending data to Weather Underground: " + err.message);
-        }
-        else{
-            console.debug("Data successfully sent!");
-        }
+        pws.sendObservations(function(err, success){
+            if (err){
+                console.error("Error sending data to Weather Underground: " + err.message);
+            }
+            else{
+                console.debug("Data successfully sent!");
+            }
 
-    });
+        });
+    } catch (error) {
+        console.error(error.message)
+    }
 }
 
 module.exports = netatmo_pws;

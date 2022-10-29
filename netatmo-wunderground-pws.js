@@ -41,6 +41,16 @@ var softwaretype=  'netatmo-wunderground-pws';
 netatmo_pws.prototype.getNetatmoData = function (){
     try {
         api = new netatmo(netatmoAuth);
+
+        api.on("error", function(error) {
+            console.error('Netatmo threw an error: ' + error);
+        });
+
+        api.on("warning", function(error) {
+            console.log('Netatmo threw a warning: ' + error);
+        });
+
+
         console.debug("Getting Netatmo data...");
         api.getStationsData(function(err, devices) {
             let dev = devices[0];

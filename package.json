@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/brbeaird/netatmo-wunderground-pws#readme",
   "dependencies": {
-    "netatmo": "^2.4.0",
+    "netatmo": "^200.4.0",
     "wunderground-pws": "^1.3.2"
   }
 }

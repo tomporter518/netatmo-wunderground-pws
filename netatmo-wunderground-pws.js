@@ -11,10 +11,10 @@ var netatmo_pws = function (args) {
 
 netatmo_pws.prototype.setAuthVars = function(args) {
     netatmoAuth = {
-        "client_id": args.netamo_client_id,
-        "client_secret": args.netamo_client_secret,
-        "username": args.netamo_username,
-        "password": args.netamo_password,
+        "client_id": args.netatmo_client_id,
+        "client_secret": args.netatmo_client_secret,
+        "refresh_token": args.netatmo_refresh_token,
+        "timeout": args.netatmo_timeout
     };
     wundergroundAuth = {
         "wundergroundStationId": args.wundergroundStationId,

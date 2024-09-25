@@ -26,7 +26,7 @@ netatmo_pws.prototype.setAuthVars = function(args) {
                 return;
                 } else if(data) {
                   wundergroundAuth = JSON.parse(data);
-		}
+        }
              });
         } else {
             console.error("Wunderground config filename missing");
@@ -66,10 +66,16 @@ netatmo_pws.prototype.getNetatmoData = function () {
             api.on("info", function(info) {
                 console.log('Netatmo logged info: ' + info);
             });
+        } else if(api.getAccessToken() === 'error') {
+            api.authenticate_refresh();
 	}
 
         console.debug("Getting Netatmo data...");
         api.getStationsData(function(err, devices) {
+            if(err) {
+                throw(err)
+            }
+
             let dev = devices[0];
             baromin = dev.dashboard_data.Pressure * 0.0295299830714;
 

@@ -73,7 +73,7 @@ netatmo_pws.prototype.getNetatmoData = function () {
         console.debug("Getting Netatmo data...");
         api.getStationsData(function(err, devices) {
             if(err) {
-                throw(err)
+                return;
             }
 
             let dev = devices[0];
@@ -125,7 +125,7 @@ netatmo_pws.prototype.getNetatmoData = function () {
 }
 
 function convertFromCtoF(value) {
-    return value * 9 /5 + 32
+    return value * 9 /5 + 32;
 }
 
 function convertFromKphToMph(value) {
@@ -173,7 +173,7 @@ function setObservations() {
 
         });
     } catch (error) {
-        console.error(error.message)
+        console.error(error.message);
     }
 }
 
